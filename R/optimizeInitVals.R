@@ -23,11 +23,8 @@ optimizeInitVals = function(K, X, Y, seX, seY, Nreps = 10, init_seed = 8686, ver
                      "m_X" = init_m_X, "lambdaX" = init_lambdaX)
     
     # Run algorithm
-    MCEM_fit = tryCatch(MR_EM(K, initVals.list[[i]], X, Y, seX, seY, 
-                              max_Nsamples = 100000, max_iters = 30, 
-                              computeSE = FALSE),
-                        error = function(x) return(NA))
-    Q = ifelse(all(is.na(MCEM_fit)), -Inf, MCEM_fit$convergenceInfo$completeDataLogLik)
+    MCEM_fit = MR_EM(K, initVals, X, Y, seX, seY, computeSE = FALSE)
+    Q = MCEM_fit$convergenceInfo$completeDataLogLik
     # Save Q value
     Q.vec = c(Q.vec, Q)
     
@@ -35,10 +32,6 @@ optimizeInitVals = function(K, X, Y, seX, seY, Nreps = 10, init_seed = 8686, ver
       print(paste("Run #",i," / Q = ",Q,sep=""))
     }
     
-  }
-  
-  if (all(is.na(Q.vec))) {
-    stop("All random initial values result in error in MR_EM.")
   }
   
   optimalInitVals = initVals.list[[which.max(Q.vec)]]

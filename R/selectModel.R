@@ -1,5 +1,5 @@
 library(loo)
-
+library(MR.MCEM)
 
 loo.cv <- function(X, Y, seX, seY, params, Nsamples = 20000, loo_method = "tis", ...) {
   

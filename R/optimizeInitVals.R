@@ -23,7 +23,7 @@ optimizeInitVals = function(K, X, Y, seX, seY, Nreps = 10, init_seed = 8686, ver
                      "m_X" = init_m_X, "lambdaX" = init_lambdaX)
     
     # Run algorithm
-    MCEM_fit = MR_EM(K, initVals, X, Y, seX, seY, computeSE = FALSE)
+    MCEM_fit = MR_EM(K, initVals.list[[i]], X, Y, seX, seY, computeSE = FALSE)
     Q = MCEM_fit$convergenceInfo$completeDataLogLik
     # Save Q value
     Q.vec = c(Q.vec, Q)

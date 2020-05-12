@@ -1,5 +1,4 @@
 library(loo)
-library(MR.MCEM)
 
 loo.cv <- function(X, Y, seX, seY, params, Nsamples = 20000, loo_method = "tis", ...) {
   
@@ -58,7 +57,7 @@ selectModel = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20,
     initVals = optimizeInitVals(K, X, Y, seX, seY, Nreps = Nreps, verbose=verbose)
     
     ## Run MC-EM with optimized initial values
-    MCEM_fit <- MR_EM(K, initVals, X, Y, seX, seY, saveTraj=saveTraj)
+    MCEM_fit = MR_EM(K, initVals, X, Y, seX, seY, saveTraj=saveTraj, computeSE = FALSE)
     
     loo_list[[K]] = loo.cv(X, Y, seX, seY, MCEM_fit$paramEst)
     

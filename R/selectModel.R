@@ -11,11 +11,11 @@ loo.cv <- function(X, Y, seX, seY, params, Nsamples = 20000, loo_method = "tis",
   # rowSumW = rowSums(impt_samps$W)
   
   muX_resamps = sapply(1:N, function(i){
-    sample(impt_samps$muX_samps[i,], N, prob = impt_samps$W, replace=TRUE)
+    sample(impt_samps$muX_samps[i,], Nsamples, prob = impt_samps$W[i,], replace=TRUE)
   })
   
   beta_resamps = sapply(1:N, function(i){
-    sample(beta_samps[i,], N, prob = impt_samps$W, replace=TRUE)
+    sample(impt_samps$beta_samps[i,], Nsamples, prob = impt_samps$W[i,], replace=TRUE)
   })
   
   
@@ -49,7 +49,7 @@ MR.waic = function(X, Y, seX, seY, params, Nsamples = 20000, ...) {
 
 
 selectModel = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20, 
-                       verbose=FALSE, saveTraj = FALSE) {
+                       verbose=FALSE) {
   
   loo_list = list()
   for (K in K_range) {
@@ -57,7 +57,7 @@ selectModel = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20,
     initVals = optimizeInitVals(K, X, Y, seX, seY, Nreps = Nreps, verbose=verbose)
     
     ## Run MC-EM with optimized initial values
-    MCEM_fit = MR_EM(K, initVals, X, Y, seX, seY, saveTraj=saveTraj, computeSE = FALSE)
+    MCEM_fit = MR_EM(K, initVals, X, Y, seX, seY, saveTraj=FALSE, computeSE=FALSE)
     
     loo_list[[K]] = loo.cv(X, Y, seX, seY, MCEM_fit$paramEst)
   }

@@ -11,7 +11,7 @@ using namespace Rcpp;
 List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
     const arma::vec &seX, const arma::vec &seY, const int &Nstart_MC = 500,
     bool equalSds = false, int M = 4, int max_Nsamples = 500000,
-    int min_iters = 2, int max_iters = 100, double alpha = 0.05,
+    int min_iters = 1, int max_iters = 100, double alpha = 0.05,
     double gamma = 0.05, double eps = 0.005, bool verbose=false,
     bool saveTraj = false, bool computeSE = true)
 {

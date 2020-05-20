@@ -20,7 +20,7 @@ loo.cv <- function(X, Y, seX, seY, params, Nsamples = 20000, loo_method = "tis",
   log_lik <- sapply(1:N, 
                     function(i) {
                       dnorm(X[i], muX_resamps[,i], seX[i], log=TRUE) + 
-                        dnorm(Y[i], beta_resamps[,i] * muX_resamps[,i], seY[i], log=Tremove.pRUE)
+                        dnorm(Y[i], beta_resamps[,i] * muX_resamps[,i], seY[i], log=TRUE)
                       })
   
   loo::loo(x = log_lik, is_method = loo_method, ...)

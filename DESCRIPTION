@@ -7,6 +7,6 @@ Author: Daniel Iong
 Maintainer: Daniel <daniong@umich.edu>
 Description: MC-EM algorithm for Bayesian model that accounts for effect heterogeneity in two-sample summary-data Mendelian Randomization analysis
 License: GPL-3
-Imports: Rcpp (>= 1.0.3), RcppArmadillo, RcppDist
+Imports: Rcpp (>= 1.0.3), RcppArmadillo, RcppDist, loo
 LinkingTo: Rcpp, RcppArmadillo, RcppDist
 RoxygenNote: 7.0.2

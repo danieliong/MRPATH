@@ -1,5 +1,3 @@
-library(loo)
-
 loo.cv <- function(X, Y, seX, seY, params, Nsamples = 20000, loo_method = "tis", ...) {
   
   N = length(X)
@@ -22,29 +20,10 @@ loo.cv <- function(X, Y, seX, seY, params, Nsamples = 20000, loo_method = "tis",
   log_lik <- sapply(1:N, 
                     function(i) {
                       dnorm(X[i], muX_resamps[,i], seX[i], log=TRUE) + 
-                        dnorm(Y[i], beta_resamps[,i] * muX_resamps[,i], seY[i], log=TRUE)
+                        dnorm(Y[i], beta_resamps[,i] * muX_resamps[,i], seY[i], log=Tremove.pRUE)
                       })
   
-  loo(x = log_lik, is_method = loo_method, ...)
-}
-
-MR.waic = function(X, Y, seX, seY, params, Nsamples = 20000, ...) {
-  
-  impt_samps <- sampleLatentVarPost(Nsamples, X, Y, seX, seY, params)
-  muX_samps <- impt_samps$muX_samps
-  beta_samps <- impt_samps$beta_samps
-  W <- impt_samps$W
-  
-  
-  log_lik <- sapply(1:nrow(muX_samps), 
-                    function(i) {
-                      dnorm(X[i], muX_samps[i,], seX[i], log=TRUE) + 
-                        dnorm(Y[i], beta_samps[i,] * muX_samps[i,], seY[i], log=TRUE)
-                    })
-  
-  log_lik_adjusted = log_lik - t(log(W))
-  
-  waic(log_lik_adjusted)
+  loo::loo(x = log_lik, is_method = loo_method, ...)
 }
 
 
@@ -62,6 +41,26 @@ selectModel = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20,
     loo_list[[K]] = loo.cv(X, Y, seX, seY, MCEM_fit$paramEst)
   }
   
-  loo_compare(x = loo_list)
+  loo::loo_compare(x = loo_list)
 }
+
+
+# MR.waic = function(X, Y, seX, seY, params, Nsamples = 20000, ...) {
+#   
+#   impt_samps <- sampleLatentVarPost(Nsamples, X, Y, seX, seY, params)
+#   muX_samps <- impt_samps$muX_samps
+#   beta_samps <- impt_samps$beta_samps
+#   W <- impt_samps$W
+#   
+#   
+#   log_lik <- sapply(1:nrow(muX_samps), 
+#                     function(i) {
+#                       dnorm(X[i], muX_samps[i,], seX[i], log=TRUE) + 
+#                         dnorm(Y[i], beta_samps[i,] * muX_samps[i,], seY[i], log=TRUE)
+#                     })
+#   
+#   log_lik_adjusted = log_lik - t(log(W))
+#   
+#   waic(log_lik_adjusted)
+# }
 

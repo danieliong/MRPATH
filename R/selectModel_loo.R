@@ -28,7 +28,7 @@ loo.cv <- function(X, Y, seX, seY, params, Nsamples = 20000, loo_method = "tis",
 
 
 selectModel = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20, 
-                       verbose=FALSE) {
+                       verbose=FALSE, loo_method = "tis") {
   
   loo_list = list()
   for (K in K_range) {
@@ -38,7 +38,7 @@ selectModel = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20,
     ## Run MC-EM with optimized initial values
     MCEM_fit = MR_EM(K, initVals, X, Y, seX, seY, saveTraj=FALSE, computeSE=FALSE)
     
-    loo_list[[K]] = loo.cv(X, Y, seX, seY, MCEM_fit$paramEst)
+    loo_list[[K]] = loo.cv(X, Y, seX, seY, MCEM_fit$paramEst, loo_method = loo_method)
   }
   
   loo::loo_compare(x = loo_list)

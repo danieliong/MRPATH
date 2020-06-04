@@ -9,4 +9,4 @@ Description: MC-EM algorithm for Bayesian model that accounts for effect heterog
 License: GPL-3
 Imports: Rcpp (>= 1.0.3), RcppArmadillo, RcppDist, loo
 LinkingTo: Rcpp, RcppArmadillo, RcppDist
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0

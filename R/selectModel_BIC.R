@@ -13,7 +13,7 @@ selectModel_BIC = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20,
     MCEM_fit = MR_EM(K, initVals, X, Y, seX, seY, saveTraj=FALSE, computeSE=FALSE)
     
     Q_vec[K] = MCEM_fit$convergenceInfo$completeDataLogLik
-    BIC_vec[K] =  Q_vec[K] - (3*K * log(p))
+    BIC_vec[K] =  (-2*Q_vec[K]) + (3*K * log(p))
   }
   
   K_opt = which.max(BIC_vec)

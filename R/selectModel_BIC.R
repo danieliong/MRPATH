@@ -16,7 +16,7 @@ selectModel_BIC = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20,
     BIC_vec[K] =  (-2*Q_vec[K]) + (3*K * log(p))
   }
   
-  K_opt = which.max(BIC_vec)
+  K_opt = which.min(BIC_vec)
   return(list("K_opt" = K_opt,
               Q = Q_vec,
               BIC = BIC_vec

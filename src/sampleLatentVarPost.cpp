@@ -18,7 +18,7 @@ List sampleLatentVarPost(int N_samples, const arma::vec &X, const arma::vec &Y, 
   arma::vec pis = params["pis"];
   arma::vec mus = params["mus"];
   arma::vec sds = params["sds"];
-  arma::vec tau = params["tau"];
+  double tau = params["tau"];
 
   int K = (int)pis.n_elem;
 

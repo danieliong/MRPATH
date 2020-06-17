@@ -17,7 +17,8 @@ MREM.scatterplot = function(data, MCEM_fit = NULL,
   } else {
     
     # sample from posterior given param estimates
-    post_impt_samples <- sampleLatentVarPost(20000, data$beta.exposure, data$beta.outcome, data$se.exposure, data$se.outcome, MCEM_fit$paramEst)
+    post_impt_samples <- sampleLatentVarPost(20000, data$beta.exposure, data$beta.outcome, data$se.exposure, data$se.outcome, 
+                                             MCEM_fit$paramEst)
     W <- post_impt_samples$W
     rowSumW <- rowSums(W)
     muX_samps <- post_impt_samples$muX_samps

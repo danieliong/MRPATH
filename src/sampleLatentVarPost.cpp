@@ -18,10 +18,11 @@ List sampleLatentVarPost(int N_samples, const arma::vec &X, const arma::vec &Y, 
   arma::vec pis = params["pis"];
   arma::vec mus = params["mus"];
   arma::vec sds = params["sds"];
+  arma::vec tau = params["tau"];
 
   int K = (int)pis.n_elem;
 
-  arma::cube samps = sampleLatentVarPostCube(N_samples, X, Y, seX, seY, m_X, lambdaX, pis, mus, sds);
+  arma::cube samps = sampleLatentVarPostCube(N_samples, X, Y, seX, tau*seY, m_X, lambdaX, pis, mus, sds);
 
   // arma::cube alpha_samps = samps.slices(3, 3+K-1);
 

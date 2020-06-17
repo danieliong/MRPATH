@@ -4,6 +4,7 @@ MREM.scatterplot = function(data, MCEM_fit = NULL,
   K = length(MCEM_fit$paramEst$pis)
   data$beta.outcome = data$beta.outcome * sign(data$beta.exposure)
   data$beta.exposure = abs(data$beta.exposure)
+  data$tau = MCEM_fit$paramEst$tau
   
   if (is.null(MCEM_fit)) {
     p = ggplot(data = data, aes(x = beta.exposure, y = beta.outcome, xmin = (beta.exposure - se.exposure), xmax = (beta.exposure + se.exposure),
@@ -38,7 +39,7 @@ MREM.scatterplot = function(data, MCEM_fit = NULL,
     names(comp_assignments) <- data$SNP
     
     p = ggplot(data = data, aes(x = beta.exposure, y = beta.outcome, xmin = (beta.exposure - se.exposure), xmax = (beta.exposure + se.exposure),
-                                ymin = (beta.outcome - se.outcome), ymax = (beta.outcome + se.outcome), 
+                                ymin = (beta.outcome - (tau*se.outcome)), ymax = (beta.outcome + (tau*se.outcome)), 
                                 color = comp_assignments)) +
       geom_point(size = 1, shape = 1) + 
       geom_errorbar(alpha = 0.5, width = 0) +

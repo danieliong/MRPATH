@@ -127,10 +127,10 @@ arma::vec normalizeImptWeights(arma::cube &ISamps) {
     return(sum_weights);
 }
 
-// In-place M-step update of parameters m_X, lambdaX, pis, mus, sds
+// In-place M-step update of parameters m_X, lambdaX, pis, mus, sds, tau
 void MR_EM_Mstep(
-    const int &p, const int &K, const bool &equalSds, const arma::cube &ISamps,
-    double &m_X, double &lambdaX, arma::vec &pis, arma::vec &mus, arma::vec &sds)
+    const int &p, const int &K, arma::vec Y, arma::vec seY, const bool &equalSds, const bool &overDispersedY, const arma::cube &ISamps,
+    double &m_X, double &lambdaX, arma::vec &pis, arma::vec &mus, arma::vec &sds, double &tau)
 {
 
     int k;
@@ -156,14 +156,21 @@ void MR_EM_Mstep(
     } else {
         sds = arma::sqrt(vars);
     }
+
+    if (overDispersedY) {
+        tau = sqrt(arma::mean((arma::pow(Y, 2) - 2 * (Y % arma::sum((ISamps.slice(0) % ISamps.slice(1) % ISamps.slice(2)), 1)) + arma::sum(ISamps.slice(0) % arma::pow(ISamps.slice(1) % ISamps.slice(2), 2), 1)) / arma::pow(seY, 2)));
+        if (tau < 1) {
+            tau = 1;
+        }
+    }
+
 }
 
 // In-place appending of importance samples if MC-EM iteration is rejected
-void appendLatentVarPostCube(arma::cube &postSamps, const arma::vec &sum_weights,
-    const int &M, const arma::vec &X, const arma::vec &Y,
+void appendLatentVarPostCube(arma::cube &postSamps, const arma::vec &sum_weights, const int &M, const arma::vec &X, const arma::vec &Y,
     const arma::vec &seX, const arma::vec &seY, const double &m_X,
-    const double &lambdaX, arma::vec pis, const arma::vec &mus, const arma::vec &sds,
-    int &N_samples)
+    const double &lambdaX, arma::vec pis, const arma::vec &mus,
+    const arma::vec &sds, int &N_samples)
 {
     int i, k, s;
     int p = (int)X.n_elem; // data sample size
@@ -267,17 +274,20 @@ void appendLatentVarPostCube(arma::cube &postSamps, const arma::vec &sum_weights
     N_samples += N_add_samples;
 }
 
-arma::mat computeQMatrix(const int &p, const int &K, const arma::cube &ISamps,
+arma::mat computeQMatrix(const int &p, const int &K, const arma::vec &Y,
+    const arma::vec &seY, const arma::cube &ISamps,
     const double &m_X, const double &lambdaX,
-    const arma::vec &pis, const arma::vec &mus, const arma::vec &sds)
+    const arma::vec &pis, const arma::vec &mus, const arma::vec &sds, const double &tau)
 {
     int N_samples = (int)ISamps.n_rows;
 
     int k;
     arma::mat Q_mat(p, N_samples);
 
-    Q_mat = -log(lambdaX) - ( (1 / (2 * pow(lambdaX, 2))) *
-    arma::pow((ISamps.slice(1) - m_X), 2) );
+    Q_mat = (((arma::mat)(
+    ((arma::mat)arma::pow((((arma::mat)(ISamps.slice(1) % ISamps.slice(2))).each_col() - Y), 2)).each_col() / (-2 * pow(tau*seY, 2)))).each_col()) - log(tau*seY);
+
+    Q_mat += -log(lambdaX) - ((1 / (2 * pow(lambdaX, 2))) * arma::pow((ISamps.slice(1) - m_X), 2));
 
     for (k = 0; k < K; ++k) {
         Q_mat += ISamps.slice(3+k) % ( log(pis(k)) - log(sds(k)) -
@@ -299,13 +309,12 @@ arma::mat computeQMatrix(const int &p, const int &K, const arma::cube &ISamps,
 
 
  bool MR_EM_diagnostic(
-     const arma::cube &ISamps, const int &p, const int &K, const double &eps,
+     const arma::cube &ISamps, const int &p, const int &K, const arma::vec &Y, const arma::vec &seY, const double &eps,
      const double &z_alpha, const double &z_gamma, const int &M,
      double &m_X, double &lambdaX, arma::vec &pis, arma::vec &mus,
-     arma::vec &sds, const double &prevIter_m_X, const double &prevIter_lambdaX,
+     arma::vec &sds, double &tau, const double &prevIter_m_X, const double &prevIter_lambdaX,
      const arma::vec &prevIterPis, const arma::vec &prevIterMus,
-     const arma::vec &prevIterSds, const bool &verbose, int &N_samples,
-     const int &N_iters, bool &rejected)
+     const arma::vec &prevIterSds, const double &prevIterTau, const bool &verbose, int &N_samples, const int &N_iters, bool &rejected)
 {
 
     int k, i;
@@ -316,9 +325,9 @@ arma::mat computeQMatrix(const int &p, const int &K, const arma::cube &ISamps,
     bool converged = false;
 
 
-    Lambda = computeQMatrix(p, K, ISamps, m_X, lambdaX, pis, mus, sds) -
-    computeQMatrix(p, K, ISamps, prevIter_m_X, prevIter_lambdaX,
-        prevIterPis, prevIterMus, prevIterSds);
+    Lambda = computeQMatrix(p, K, Y, seY, ISamps, m_X, lambdaX, pis, mus, sds, tau) -
+    computeQMatrix(p, K, Y, seY, ISamps, prevIter_m_X, prevIter_lambdaX,
+        prevIterPis, prevIterMus, prevIterSds, prevIterTau);
 
 
     // // Compute Lambda (log likelihood difference) matrix
@@ -392,6 +401,7 @@ arma::mat computeQMatrix(const int &p, const int &K, const arma::cube &ISamps,
         pis = prevIterPis;
         mus = prevIterMus;
         sds = prevIterSds;
+        tau = prevIterTau;
 
         // /* ########## append more MC samples to existing ISamps ########### */
         //

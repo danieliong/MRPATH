@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // MR_EM
-List MR_EM(int K, const List& initVals, const arma::vec& X, const arma::vec& Y, const arma::vec& seX, const arma::vec& seY, const int& Nstart_MC, bool equalSds, int M, int max_Nsamples, int min_iters, int max_iters, double alpha, double gamma, double eps, bool verbose, bool saveTraj, bool computeSE);
-RcppExport SEXP _MR_MCEM_MR_EM(SEXP KSEXP, SEXP initValsSEXP, SEXP XSEXP, SEXP YSEXP, SEXP seXSEXP, SEXP seYSEXP, SEXP Nstart_MCSEXP, SEXP equalSdsSEXP, SEXP MSEXP, SEXP max_NsamplesSEXP, SEXP min_itersSEXP, SEXP max_itersSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP epsSEXP, SEXP verboseSEXP, SEXP saveTrajSEXP, SEXP computeSESEXP) {
+List MR_EM(int K, const List& initVals, const arma::vec& X, const arma::vec& Y, const arma::vec& seX, const arma::vec& seY, bool overDispersedY, bool equalSds, const int& Nstart_MC, int M, int max_Nsamples, int min_iters, int max_iters, double alpha, double gamma, double eps, bool verbose, bool saveTraj, bool computeSE);
+RcppExport SEXP _MR_MCEM_MR_EM(SEXP KSEXP, SEXP initValsSEXP, SEXP XSEXP, SEXP YSEXP, SEXP seXSEXP, SEXP seYSEXP, SEXP overDispersedYSEXP, SEXP equalSdsSEXP, SEXP Nstart_MCSEXP, SEXP MSEXP, SEXP max_NsamplesSEXP, SEXP min_itersSEXP, SEXP max_itersSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP epsSEXP, SEXP verboseSEXP, SEXP saveTrajSEXP, SEXP computeSESEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -18,8 +18,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::vec& >::type Y(YSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type seX(seXSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type seY(seYSEXP);
-    Rcpp::traits::input_parameter< const int& >::type Nstart_MC(Nstart_MCSEXP);
+    Rcpp::traits::input_parameter< bool >::type overDispersedY(overDispersedYSEXP);
     Rcpp::traits::input_parameter< bool >::type equalSds(equalSdsSEXP);
+    Rcpp::traits::input_parameter< const int& >::type Nstart_MC(Nstart_MCSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< int >::type max_Nsamples(max_NsamplesSEXP);
     Rcpp::traits::input_parameter< int >::type min_iters(min_itersSEXP);
@@ -30,7 +31,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< bool >::type saveTraj(saveTrajSEXP);
     Rcpp::traits::input_parameter< bool >::type computeSE(computeSESEXP);
-    rcpp_result_gen = Rcpp::wrap(MR_EM(K, initVals, X, Y, seX, seY, Nstart_MC, equalSds, M, max_Nsamples, min_iters, max_iters, alpha, gamma, eps, verbose, saveTraj, computeSE));
+    rcpp_result_gen = Rcpp::wrap(MR_EM(K, initVals, X, Y, seX, seY, overDispersedY, equalSds, Nstart_MC, M, max_Nsamples, min_iters, max_iters, alpha, gamma, eps, verbose, saveTraj, computeSE));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -52,7 +53,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_MR_MCEM_MR_EM", (DL_FUNC) &_MR_MCEM_MR_EM, 18},
+    {"_MR_MCEM_MR_EM", (DL_FUNC) &_MR_MCEM_MR_EM, 19},
     {"_MR_MCEM_sampleLatentVarPost", (DL_FUNC) &_MR_MCEM_sampleLatentVarPost, 6},
     {NULL, NULL, 0}
 };

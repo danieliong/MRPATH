@@ -12,7 +12,7 @@ selectModel_BIC = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20,
         initVals = optimizeInitVals(K, X, Y, seX, seY, Nreps = Nreps, verbose=verbose)
 
         ## Run MC-EM with optimized initial values
-        MCEM_fit[[k]] = MR_EM(K, initVals, X, Y, seX, seY, saveTraj=FALSE, computeSE=FALSE)
+        MCEM_fit[[K]] = MR_EM(K, initVals, X, Y, seX, seY, saveTraj=FALSE, computeSE=FALSE)
 
         Q_vec[K] = MCEM_fit[[k]]$convergenceInfo$completeDataLogLik
         BIC_vec[K] =  (-2*Q_vec[K]) + (3*K * log(p))

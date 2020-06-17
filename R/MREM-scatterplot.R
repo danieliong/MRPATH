@@ -59,7 +59,7 @@ MREM.scatterplot = function(data, MCEM_fit = NULL,
     lines_dat$k = as.numeric(sapply(1:K, function(k) rep(k, length(x_grid))))
     
     p = p + geom_line(data = lines_dat, 
-                      aes(x = x, y = y, color = as.factor(k)), linetype =2, 
+                      aes(x = x, y = y, color = as.factor(k)), linetype = 1, size = .8, 
                       inherit.aes = FALSE) +
       geom_ribbon(data = lines_dat, 
                   aes(x = x, ymin = ymin, ymax = ymax, fill = as.factor(k)), alpha = 0.4,

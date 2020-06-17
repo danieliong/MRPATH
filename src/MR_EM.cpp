@@ -9,11 +9,11 @@ using namespace Rcpp;
 
 //[[Rcpp::export]]
 List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
-    const arma::vec &seX, const arma::vec &seY, const int &Nstart_MC = 500,
-    bool equalSds = false, int M = 4, int max_Nsamples = 500000,
-    int min_iters = 2, int max_iters = 100, double alpha = 0.05,
-    double gamma = 0.05, double eps = 0.005, bool verbose=false,
-    bool saveTraj = false, bool computeSE = true)
+    const arma::vec &seX, const arma::vec &seY, bool overDispersedY = false,
+    bool equalSds = false, const int &Nstart_MC = 500, int M = 4,
+    int max_Nsamples = 500000, int min_iters = 2, int max_iters = 100,
+    double alpha = 0.05, double gamma = 0.05, double eps = 0.005,
+    bool verbose=false, bool saveTraj = false, bool computeSE = true)
 {
 
   // Initialize starting values for parameters
@@ -28,6 +28,9 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
   // z score for alpha, gamma
   double z_alpha = R::qnorm5(alpha, 0, 1, false, false);
   double z_gamma = R::qnorm5(gamma, 0, 1, false, false);
+
+  // Overdispersion parameter for seY
+  double tau = 1;
 
   bool rejected = false;
   bool converged = false;
@@ -86,6 +89,7 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
   arma::vec prevIterPis;
   arma::vec prevIterMus;
   arma::vec prevIterSds;
+  double prevIterTau;
 
   arma::mat observedInfoMtx((2+(3*K) - 1), (2 + (3*K) - 1));
   arma::vec se((2+(3*K)-1));
@@ -106,11 +110,11 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
 
     if (!rejected) {
         ISamps.set_size(p, N_samples, 3+K);
-        ISamps = sampleLatentVarPostCube(N_samples, X, Y, seX, seY, m_X, lambdaX,
+        ISamps = sampleLatentVarPostCube(N_samples, X, Y, seX, tau*seY, m_X, lambdaX,
             pis, mus, sds);
     } else {
         appendLatentVarPostCube(ISamps, sum_weights, M, X, Y, seX,
-            seY, m_X, lambdaX, pis, mus, sds, N_samples);
+            tau*seY, m_X, lambdaX, pis, mus, sds, N_samples);
     }
 
     // normalize importance weights and save to sum_weights
@@ -126,8 +130,9 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
      prevIterPis = pis;
      prevIterMus = mus;
      prevIterSds = sds;
+     prevIterTau = tau;
 
-     MR_EM_Mstep(p, K, equalSds, ISamps, m_X, lambdaX, pis, mus, sds);
+     MR_EM_Mstep(p, K, Y, seY, equalSds, overDispersedY, ISamps, m_X, lambdaX, pis, mus, sds, tau);
 
      if (verbose) {
          // Print curent iteration parameter updates
@@ -139,6 +144,7 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
         Rcout << mus << std::endl;
         Rcout << "sds: " << std::endl;
         Rcout << sds << std::endl;
+        Rcout << "tau: " << tau << std::endl;
     }
 
 
@@ -146,9 +152,9 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
                      Diagnostics
     ############################################################### */
 
-    converged = MR_EM_diagnostic(ISamps, p, K, eps, z_alpha,
-        z_gamma, M, m_X, lambdaX, pis, mus, sds,
-        prevIter_m_X, prevIter_lambdaX, prevIterPis, prevIterMus, prevIterSds,
+    converged = MR_EM_diagnostic(ISamps, p, K, Y, seY, eps, z_alpha,
+        z_gamma, M, m_X, lambdaX, pis, mus, sds, tau,
+        prevIter_m_X, prevIter_lambdaX, prevIterPis, prevIterMus, prevIterSds, prevIterTau,
         verbose, N_samples, N_iters, rejected);
 
 
@@ -178,7 +184,7 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
 
     }
 
-    arma::mat Q_mat = computeQMatrix(p, K, ISamps, m_X, lambdaX, pis, mus, sds);
+    arma::mat Q_mat = computeQMatrix(p, K, Y, seY, ISamps, m_X, lambdaX, pis, mus, sds, tau);
     double completeDataLogLik = arma::accu(ISamps.slice(0) % Q_mat);
 
     /* ###############################################################
@@ -187,7 +193,7 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
 
    if (computeSE) {
 
-       observedInfoMtx = computeObservedInfoMatrix(X, Y, seX, seY, m_X, lambdaX,
+       observedInfoMtx = computeObservedInfoMatrix(X, Y, seX, tau*seY, m_X, lambdaX,
            pis, mus, sds, N_samples
        );
 
@@ -199,7 +205,8 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
         _["lambdaX"] = lambdaX,
         _["pis"] = pis,
         _["mus"] = mus,
-        _["sds"] = sds
+        _["sds"] = sds,
+        _["tau"] = tau
     );
   List convergenceInfo = List::create(
         Named("Niters") = N_iters,

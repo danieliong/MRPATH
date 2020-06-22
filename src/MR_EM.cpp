@@ -13,7 +13,7 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
     bool equalSds = false, const int &Nstart_MC = 500, int M = 4,
     int max_Nsamples = 500000, int min_iters = 2, int max_iters = 100,
     double alpha = 0.05, double gamma = 0.05, double eps = 0.005,
-    bool verbose=false, bool saveTraj = false, bool computeSE = true, bool noMixtureVar = false)
+    bool verbose=false, bool saveTraj = false, bool computeSE = true)
 {
 
   // Initialize starting values for parameters

@@ -13,7 +13,7 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
     bool equalSds = false, const int &Nstart_MC = 500, int M = 4,
     int max_Nsamples = 500000, int min_iters = 2, int max_iters = 100,
     double alpha = 0.05, double gamma = 0.05, double eps = 0.005,
-    bool verbose=false, bool saveTraj = false, bool computeSE = true)
+    bool verbose=false, bool saveTraj = false, bool computeSE = true, bool noMixtureVar = false)
 {
 
   // Initialize starting values for parameters
@@ -110,8 +110,7 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
 
     if (!rejected) {
         ISamps.set_size(p, N_samples, 3+K);
-        ISamps = sampleLatentVarPostCube(N_samples, X, Y, seX, tau*seY, m_X, lambdaX,
-            pis, mus, sds);
+        ISamps = sampleLatentVarPostCube(N_samples, X, Y, seX, tau*seY, m_X, lambdaX, pis, mus, sds);
     } else {
         appendLatentVarPostCube(ISamps, sum_weights, M, X, Y, seX,
             tau*seY, m_X, lambdaX, pis, mus, sds, N_samples);

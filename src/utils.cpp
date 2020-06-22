@@ -120,6 +120,7 @@ arma::cube sampleLatentVarPostCube(int N_samples, const arma::vec &X, const arma
 }
 
 
+
 // Normalize importance weights in-place and return normalization constants
 arma::vec normalizeImptWeights(arma::cube &ISamps) {
     arma::vec sum_weights = sum(ISamps.slice(0), 1);

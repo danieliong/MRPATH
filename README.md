@@ -1,5 +1,7 @@
 # MRPATH
 
+A preprint for the MR-PATH paper is available at https://arxiv.org/abs/2007.06476.
+
 
 ## Setup
 
@@ -15,4 +17,8 @@ The main functions in **MRPATH** are `MR_PATH`, `MRPATH_optimizeInitVals`, and `
 
 Auxiliary functions available in **MRPATH**: `sampleBetas` and `computeClusterMembProb`. These functions are used after obtaining the MC-EM model fit to investigate SNP-specific latent variables in the MR-PATH model.
 
-Plotting functions available in **MRPATH**: `MRPATH_scatterplot`, `MRPATH_barplot`. 
+Plotting functions available in **MRPATH**: `MRPATH_scatterplot`, `MRPATH_barplot`.
+
+## Examples
+
+You can find examples using the HDl-CHD dataset described in the paper

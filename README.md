@@ -21,4 +21,28 @@ Plotting functions available in **MRPATH**: `MRPATH_scatterplot`, `MRPATH_barplo
 
 ## Examples
 
-You can find examples using the HDl-CHD dataset described in the paper
+You can find examples using the HDl-CHD dataset described in the [preprint](https://arxiv.org/abs/2007.06476) by running any of the following R commands.
+
+```
+library(MRPATH)
+
+example("MR_PATH")
+
+example("MRPATH_optimizeInitVals")
+
+example("MRPATH_selectModel")
+
+example("getImportanceSamples")
+
+example("sampleBetas")
+
+example("computeClusterMembProb")
+
+example("MRPATH_scatterplot")
+
+example("MRPATH_barplot")
+```
+
+## Troubleshooting
+
+Please report issues and suggestions for the **MRPATH** R package using the [Github issues tracker](https://github.com/danieliong/mr.path/issues).

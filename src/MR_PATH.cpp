@@ -8,64 +8,69 @@ using namespace Rcpp;
 
 
 //[[Rcpp::export]]
-List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
-    const arma::vec &seX, const arma::vec &seY, bool overDispersedY = false,
-    bool equalSds = false, const int &Nstart_MC = 500, int M = 4,
-    int max_Nsamples = 500000, int min_iters = 2, int max_iters = 100,
-    double alpha = 0.05, double gamma = 0.05, double eps = 0.005,
-    bool verbose=false, bool saveTraj = false, bool computeSE = true)
+List MR_PATH(int K, const DataFrame &data, const List &initVals,
+    bool overDispersedY = false, bool equalSds = false, bool computeSE = true,
+    const int &Nstart_MC = 500, int M = 4, int max_Nsamples = 500000,
+    int min_iters = 2, int max_iters = 100, double alpha = 0.05,
+    double gamma = 0.05, double eps = 0.005, bool verbose=false,
+    bool saveTraj = false)
 {
+    // Extract data
+    arma::vec X = data["beta.exposure"];
+    arma::vec Y = data["beta.outcome"];
+    arma::vec seX = data["se.exposure"];
+    arma::vec seY = data["se.outcome"];
 
-  // Initialize starting values for parameters
-  double m_X = initVals["m_X"];
-  double lambdaX = initVals["lambdaX"];
-  arma::vec pis = initVals["pis"];
-  arma::vec mus = initVals["mus"];
-  arma::vec sds = initVals["sds"];
+    // Initialize starting values for parameters
+    double m_X = initVals["m_X"];
+    double lambdaX = initVals["lambdaX"];
+    arma::vec pis = initVals["pis"];
+    arma::vec mus = initVals["mus"];
+    arma::vec sds = initVals["sds"];
 
-  int p = (int)X.n_elem; // data sample size
+    int p = (int)X.n_elem; // data sample size
 
-  // z score for alpha, gamma
-  double z_alpha = R::qnorm5(alpha, 0, 1, false, false);
-  double z_gamma = R::qnorm5(gamma, 0, 1, false, false);
+    // z score for alpha, gamma
+    double z_alpha = R::qnorm5(alpha, 0, 1, false, false);
+    double z_gamma = R::qnorm5(gamma, 0, 1, false, false);
 
-  // Overdispersion parameter for seY
-  double tau = 1;
+    // Overdispersion parameter for seY
+    double tau = 1;
 
-  bool rejected = false;
-  bool converged = false;
+    bool rejected = false;
+    bool converged = false;
 
-  int N_iters = 1;
+    int N_iters = 1;
 
-  /* #################### Error Checking for input ######################## */
+    /* #################### Error Checking for input ######################## */
 
-  // check if pis, mus, sds are same size
-  if ((mus.n_elem != K) || (sds.n_elem != K)) {
+    // check if pis, mus, sds are same size
+    if ((mus.n_elem != K) || (sds.n_elem != K)) {
     throw exception("pis, mus, sds, are not all of size K!");
-  }
+    }
 
-  // check if X, Y, seX, seY are the same size
-  if ((Y.n_elem != p) || (seX.n_elem != p) || (seY.n_elem != p)) {
+    // check if X, Y, seX, seY are the same size
+    if ((Y.n_elem != p) || (seX.n_elem != p) || (seY.n_elem != p)) {
     throw exception("X, Y, seX, seY are not all of size K!");
-  }
+    }
 
-  /* ###################################################################### */
+    /* ###################################################################### */
 
-  // Initialize starting MC sample size
-  int N_samples = Nstart_MC;
-  if (verbose) {
+    // Initialize starting MC sample size
+    int N_samples = Nstart_MC;
+    if (verbose) {
     Rcout << "Starting MC sample size: " << N_samples << std::endl;
-  }
+    }
 
 
-  // Matrices to store M-step updates at each iteration
-  arma::vec m_X_updates;
-  arma::vec lambdaX_updates;
-  arma::mat pis_updates;
-  arma::mat mus_updates;
-  arma::mat sds_updates;
+    // Matrices to store M-step updates at each iteration
+    arma::vec m_X_updates;
+    arma::vec lambdaX_updates;
+    arma::mat pis_updates;
+    arma::mat mus_updates;
+    arma::mat sds_updates;
 
-  if (saveTraj){
+    if (saveTraj){
     m_X_updates.set_size(1);
     lambdaX_updates.set_size(1);
     pis_updates.set_size(K, 1);
@@ -78,26 +83,26 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
     pis_updates.col(0) = pis;
     mus_updates.col(0) = mus;
     sds_updates.col(0) = sds;
-  }
+    }
 
-  arma::cube ISamps(p, Nstart_MC, K);
-  arma::vec sum_weights(p);
+    arma::cube ISamps(p, Nstart_MC, K);
+    arma::vec sum_weights(p);
 
-  // Parameter updates from previous iteration
-  double prevIter_m_X;
-  double prevIter_lambdaX;
-  arma::vec prevIterPis;
-  arma::vec prevIterMus;
-  arma::vec prevIterSds;
-  double prevIterTau;
+    // Parameter updates from previous iteration
+    double prevIter_m_X;
+    double prevIter_lambdaX;
+    arma::vec prevIterPis;
+    arma::vec prevIterMus;
+    arma::vec prevIterSds;
+    double prevIterTau;
 
-  arma::mat observedInfoMtx((2+(3*K) - 1), (2 + (3*K) - 1));
-  arma::vec se((2+(3*K)-1));
+    arma::mat observedInfoMtx((2+(3*K) - 1), (2 + (3*K) - 1));
+    arma::vec se((2+(3*K)-1));
 
-  while ((N_iters <= min_iters) ||
-  (!converged &&
-  (N_iters < max_iters) && (N_samples < max_Nsamples)))
-  {
+    while ((N_iters <= min_iters) ||
+    (!converged &&
+    (N_iters < max_iters) && (N_samples < max_Nsamples)))
+    {
 
     if (verbose){
       Rcout << "#################### Iter #: " << N_iters <<
@@ -110,7 +115,7 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
 
     if (!rejected) {
         ISamps.set_size(p, N_samples, 3+K);
-        ISamps = sampleLatentVarPostCube(N_samples, X, Y, seX, tau*seY, m_X, lambdaX, pis, mus, sds);
+        ISamps = getImportanceSamplesCube(N_samples, X, Y, seX, tau*seY, m_X, lambdaX, pis, mus, sds);
     } else {
         appendLatentVarPostCube(ISamps, sum_weights, M, X, Y, seX,
             tau*seY, m_X, lambdaX, pis, mus, sds, N_samples);
@@ -188,18 +193,18 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
 
     /* ###############################################################
                     Standard Error
-   ############################################################### */
+    ############################################################### */
 
-   if (computeSE) {
+    if (computeSE) {
 
        observedInfoMtx = computeObservedInfoMatrix(X, Y, seX, tau*seY, m_X, lambdaX,
            pis, mus, sds, N_samples
        );
 
        se = arma::sqrt(((arma::mat)observedInfoMtx.i()).diag());
-   }
+    }
 
-  List paramEst = List::create(
+    List paramEst = List::create(
         Named("m_X") = m_X,
         _["lambdaX"] = lambdaX,
         _["pis"] = pis,
@@ -207,16 +212,16 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
         _["sds"] = sds,
         _["tau"] = tau
     );
-  List convergenceInfo = List::create(
+    List convergenceInfo = List::create(
         Named("Niters") = N_iters,
         _["N_MC_end"] = N_samples,
         _["completeDataLogLik"] = completeDataLogLik
     );
 
-  List paramTraj = R_NilValue;
+    List paramTraj = R_NilValue;
 
 
- if (saveTraj) {
+    if (saveTraj) {
      paramTraj = List::create(
          Named("m_X") = m_X_updates,
          _["lambdaX"] = lambdaX_updates,
@@ -224,11 +229,11 @@ List MR_EM(int K, const List &initVals, const arma::vec &X, const arma::vec &Y,
          _["mus"] = mus_updates,
          _["sds"] = sds_updates
      );
- }
+    }
 
- // TODO: Add cluster probabilities
+    // TODO: Add cluster probabilities
 
-  return List::create(
+    return List::create(
       Named("paramEst") = paramEst,
       _["standardErrors"] = se,
       _["convergenceInfo"] = convergenceInfo,

@@ -5,7 +5,7 @@
 #include <math.h>
 using namespace Rcpp;
 
-// Obtain importance samples from latent variable posterior
+// Obtain importance samples
 /*
 Slices:
 1 - W
@@ -13,7 +13,7 @@ Slices:
 3 - beta_samps
 4 - 4 + K: alpha_samps
 */
-arma::cube sampleLatentVarPostCube(int N_samples, const arma::vec &X, const arma::vec &Y,
+arma::cube getImportanceSamplesCube(int N_samples, const arma::vec &X, const arma::vec &Y,
     const arma::vec &seX, const arma::vec &seY, const double &m_X,
     const double &lambdaX, arma::vec pis, const arma::vec &mus,
     const arma::vec &sds, const bool &normalize_weights = false) {
@@ -317,8 +317,6 @@ arma::mat computeQMatrix(const int &p, const int &K, const arma::vec &Y,
      const arma::vec &prevIterPis, const arma::vec &prevIterMus,
      const arma::vec &prevIterSds, const double &prevIterTau, const bool &verbose, int &N_samples, const int &N_iters, bool &rejected)
 {
-
-    int k, i;
     arma::mat Lambda(p, N_samples);
     double deltaQ;
     double se_Q;
@@ -407,7 +405,7 @@ arma::mat computeQMatrix(const int &p, const int &K, const arma::vec &Y,
         // /* ########## append more MC samples to existing ISamps ########### */
         //
         // int N_add_samples = ceil(N_samples/M);
-        // arma::cube new_ISamps = sampleLatentVarPostCube(N_add_samples, X, Y,
+        // arma::cube new_ISamps = getImportanceSamplesCube(N_add_samples, X, Y,
         // seX, seY, m_X, lambdaX, pis, mus, sds);
         //
         // // unnormalize existing ISamps

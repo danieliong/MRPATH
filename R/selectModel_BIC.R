@@ -1,28 +1,39 @@
-selectModel_BIC = function(X, Y, seX, seY, K_range = 1:3, Nreps = 20,
-                           verbose=FALSE) {
+MRPATH_selectModel = function(data, K_range = 1:3,
+    Nreps = 20, altModel = FALSE, verbose=FALSE, ...) {
 
-    p = length(X)
     Q_vec = rep(NA, max(K_range))
     BIC_vec = rep(NA, max(K_range))
-
-    MCEM_fit <- list()
+    fit <- list()
 
     for (K in K_range) {
-        ## Choose initial values that maximizes likelihood
-        initVals = optimizeInitVals(K, X, Y, seX, seY, Nreps = Nreps, verbose=verbose)
 
-        ## Run MC-EM with optimized initial values
-        MCEM_fit[[K]] = MR_EM(K, initVals, X, Y, seX, seY, saveTraj=FALSE, computeSE=FALSE)
+        fit[[K]] = MRPATH_optimizeInitVals(data = data, K = K, altModel = altModel, ...)$fit
+        if (altModel) {
+            Q_vec[K] = fit[[K]]$completeDataLogLik
+        } else {
+            Q_vec[K] = fit[[K]]$convergenceInfo$completeDataLogLik
+        }
 
-        Q_vec[K] = MCEM_fit[[k]]$convergenceInfo$completeDataLogLik
+        if (is.null(data)) {
+            p = length(X)
+        } else {
+            p = nrow(data)
+        }
+
         BIC_vec[K] =  (-2*Q_vec[K]) + (3*K * log(p))
+
+        if (verbose) {
+            print(paste("K = ",K,": BIC = ",BIC_vec[K],sep=""))
+        }
     }
 
-    K_opt = which.min(BIC_vec)
-    return(list(K_opt = K_opt,
+    bestK = which.min(BIC_vec)
+    bestFit = fit[[bestK]]
+
+    return(list(bestK = bestK,
+                bestFit = bestFit,
                 Q = Q_vec,
-                BIC = BIC_vec,
-                MCEM_fit = MCEM_fit
+                BIC = BIC_vec
                 )
            )
 }

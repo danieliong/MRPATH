@@ -15,7 +15,6 @@ arma::mat computeExpectedHessian(const arma::cube &normISamps,
     int K = (int)pis.n_elem;
 
     int k;
-
     int pi_k_ind;
     int mu_k_ind;
     int var_k_ind;
@@ -82,10 +81,6 @@ arma::mat computeExpectedGradient(const arma::cube &normISamps,
 
     int k;
 
-    int pi_k_ind;
-    int mu_k_ind;
-    int var_k_ind;
-
     arma::mat G(2, p);
 
     arma::vec E_N_ik(p);
@@ -148,7 +143,6 @@ arma::mat computeGradSamples_i(const int &i, const arma::cube &normISamps,
     const arma::vec &mus, const arma::vec &sds)
 {
     // const int Nparams = 2 + (3*K) - 1;
-    const int p = (int)normISamps.n_rows;
     const int K = (int)pis.n_elem;
     const int M = normISamps.n_cols;
 
@@ -237,7 +231,7 @@ arma::mat computeObservedInfoMatrix(const arma::vec &X, const arma::vec &Y,
     arma::mat J = arma::eye(Nparams, Nparams);
     arma::mat I(Nparams, Nparams);
 
-    arma::cube normISamps = sampleLatentVarPostCube(Nsamples, X, Y, seX, seY,
+    arma::cube normISamps = getImportanceSamplesCube(Nsamples, X, Y, seX, seY,
         m_X, lambdaX, pis, mus, sds, true);
 
     arma::mat H = computeExpectedHessian(normISamps, m_X, lambdaX,

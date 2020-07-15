@@ -1,12 +1,24 @@
-Package: MR.MCEM
+Package: MRPATH
 Type: Package
-Title: MC-EM Algorithm for Bayesian Mendelian Randomization 
+Title: R Package for MR-PATH
 Version: 1.0
-Date: 2019-06-08
+Date: 2020-07-14
 Author: Daniel Iong
 Maintainer: Daniel <daniong@umich.edu>
-Description: MC-EM algorithm for Bayesian model that accounts for effect heterogeneity in two-sample summary-data Mendelian Randomization analysis
+Description: This package implements methods for fitting the MR-PATH model.
 License: GPL-3
-Imports: Rcpp (>= 1.0.3), RcppArmadillo, RcppDist, loo
+Imports:
+    Rcpp (>= 1.0.3),
+    RcppArmadillo,
+    loo,
+    ggplot2,
+    cowplot,
+    plotly,
+    RColorBrewer,
+    Rdpack (>= 0.7),
+    stats,
+    reshape2
 LinkingTo: Rcpp, RcppArmadillo, RcppDist
 RoxygenNote: 7.1.0
+RdMacros: Rdpack
+Encoding: UTF-8

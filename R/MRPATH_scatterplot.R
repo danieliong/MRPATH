@@ -1,4 +1,4 @@
-MREM.scatterplot = function(data, MCEM_fit = NULL,
+MRPATH_scatterplot = function(data, MCEM_fit = NULL,
                             exposure_name = "exposure", outcome_name = "outcome", overDispersedY = FALSE) {
 
   K = length(MCEM_fit$paramEst$pis)
@@ -21,31 +21,18 @@ MREM.scatterplot = function(data, MCEM_fit = NULL,
       theme_classic(base_size = 15) + geom_hline(yintercept = 0, linetype = "dotted", alpha = 0.4) +
       geom_vline(xintercept = 0, linetype = "dotted", alpha = 0.4) + scale_color_brewer(palette="Set1")
   } else {
-
-    # sample from posterior given param estimates
-    post_impt_samples <- sampleLatentVarPost(20000, data$beta.exposure, data$beta.outcome, data$se.exposure, data$se.outcome,
-                                             MCEM_fit$paramEst)
-    W <- post_impt_samples$W
-    rowSumW <- rowSums(W)
-    muX_samps <- post_impt_samples$muX_samps
-    beta_samps <- post_impt_samples$beta_samps
-    prob_samps <- post_impt_samples$alpha_samps
-
     fitted.pis <- MCEM_fit$paramEst$pis
     fitted.mus <- MCEM_fit$paramEst$mus
     fitted.sds <- MCEM_fit$paramEst$sds
 
-    prob_est <- matrix(NA, nrow = nrow(data), ncol = K)
-    for (k in 1:K) {
-      prob_est[,k] <- rowSums(W * prob_samps[,,k]) / rowSumW
-    }
+    clustermemb_prob = computeClusterMembProb(data, MCEM_fit = MCEM_fit)
 
-    comp_assignments <- as.factor(apply(prob_est,1,which.max))
-    names(comp_assignments) <- data$SNP
+    clusters <- as.factor(apply(clustermemb_prob,1,which.max))
+    names(clusters) <- data$SNP
 
     p = ggplot(data = data, aes(x = beta.exposure, y = beta.outcome, xmin = (beta.exposure - se.exposure), xmax = (beta.exposure + se.exposure),
                                 ymin = (beta.outcome - (tau*se.outcome)), ymax = (beta.outcome + (tau*se.outcome)),
-                                color = comp_assignments)) +
+                                color = clusters)) +
       geom_point(size = 1, shape = 1) +
       geom_errorbar(alpha = 0.5, width = 0) +
       geom_errorbarh(alpha = 0.5, height = 0) +
@@ -89,14 +76,14 @@ MREMalt.scatterplot = function(data, EM_fit = NULL,
 
     data$SNPtext = sapply(1:p, function(i) paste(round(clusterMembProb[i,],digits=3), collapse = ", "))
 
-    comp_assignments = as.factor(apply(EM_fit$clusterMembProb, 1, which.max))
-    names(comp_assignments) = data$SNP
+    clusters = as.factor(apply(EM_fit$clusterMembProb, 1, which.max))
+    names(clusters) = data$SNP
 
     colors = RColorBrewer::brewer.pal(5, "Set1")
 
     p = ggplot(data = data, aes(x = beta.exposure, y = beta.outcome, xmin = (beta.exposure - se.exposure), xmax = (beta.exposure + se.exposure),
                                 ymin = (beta.outcome - (tau*se.outcome)), ymax = (beta.outcome + (tau*se.outcome)),
-                                color = comp_assignments)) +
+                                color = clusters)) +
       geom_point(size = 1, shape = 1,
           aes(text = SNPtext)) +
       geom_errorbar(alpha = 0.5, width = 0) +
@@ -118,11 +105,10 @@ MREMalt.scatterplot = function(data, EM_fit = NULL,
       if (interactive) {
           p = ggplotly(p, tooltip = c("text"))
           p = add_lines(p, x = ~x, y = ~y, color = ~k, colors = "Set1",
-              data = lines_dat, inherit = TRUE, hoverinfo = "skip")
+              data = lines_dat, inherit = TRUE, hoverinfo = "none")
       } else {
           p = p + theme(legend.justification = c(0,0), legend.position = c(.05,.005),
                         legend.direction = "horizontal") +
-            geom_abline(slope = fitted.mus, color = colors[1:K]) +
             geom_line(data = lines_dat,
                       aes(x = x, y = y, color = as.factor(k)),
                       linetype = 1, size = .8, inherit.aes = FALSE)

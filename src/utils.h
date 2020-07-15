@@ -3,7 +3,7 @@
 
 using namespace Rcpp;
 
-arma::cube sampleLatentVarPostCube(int N_samples, const arma::vec &X,
+arma::cube getImportanceSamplesCube(int N_samples, const arma::vec &X,
     const arma::vec &Y, const arma::vec &seX, const arma::vec &seY,
     const double &m_X, const double &lambdaX, arma::vec pis,
     const arma::vec &mus, const arma::vec &sds,

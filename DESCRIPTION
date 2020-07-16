@@ -8,16 +8,17 @@ Maintainer: Daniel <daniong@umich.edu>
 Description: This package implements methods for fitting the MR-PATH model.
 License: GPL-3
 Imports:
+    cowplot,
+    ggplot2,
     Rcpp (>= 1.0.3),
     RcppArmadillo,
-    loo,
-    ggplot2,
-    cowplot,
-    plotly,
     RColorBrewer,
     Rdpack (>= 0.7),
-    stats,
-    reshape2
+    reshape2,
+    stats
+Suggests:
+    loo,
+    plotly
 LinkingTo: Rcpp, RcppArmadillo, RcppDist
 RoxygenNote: 7.1.0
 RdMacros: Rdpack

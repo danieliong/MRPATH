@@ -84,7 +84,7 @@ MRPATH_scatterplot <- function(data, MCEM_fit = NULL,
       p_interactive <- plotly::ggplotly(p, tooltip = c("text"))
 
       # Fix legend labels
-      p_interactive <- plotly_build(p_interactive)
+      p_interactive <- plotly::plotly_build(p_interactive)
       for (k in 1:K) {
         p_interactive$x$data[[k]]$name <- as.character(k)
       }

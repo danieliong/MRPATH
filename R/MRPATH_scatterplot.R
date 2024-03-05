@@ -90,6 +90,8 @@ MRPATH_scatterplot <- function(data, MCEM_fit = NULL,
       }
 
       # Add lines and intervals
+      p_build <- ggplot_build(p)
+      x_grid <- seq(0, p_build$layout$panel_params[[1]]$x.range[2], .001)
       for (k in 1:K) {
         y <- (fitted.mus[k]) * x_grid
         ymin <- (fitted.mus[k] - fitted.sds[k]) * x_grid

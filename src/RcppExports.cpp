@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // MR_PATH
 List MR_PATH(int K, const DataFrame& data, const List& initVals, bool overDispersedY, bool equalSds, bool computeSE, const int& Nstart_MC, int M, int max_Nsamples, int min_iters, int max_iters, double alpha, double gamma, double eps, bool verbose, bool saveTraj);
 RcppExport SEXP _MRPATH_MR_PATH(SEXP KSEXP, SEXP dataSEXP, SEXP initValsSEXP, SEXP overDispersedYSEXP, SEXP equalSdsSEXP, SEXP computeSESEXP, SEXP Nstart_MCSEXP, SEXP MSEXP, SEXP max_NsamplesSEXP, SEXP min_itersSEXP, SEXP max_itersSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP epsSEXP, SEXP verboseSEXP, SEXP saveTrajSEXP) {

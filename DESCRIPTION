@@ -10,6 +10,7 @@ License: GPL-3
 Imports:
     cowplot,
     ggplot2,
+    plotly,
     Rcpp (>= 1.0.3),
     RcppArmadillo,
     RColorBrewer,
@@ -17,8 +18,7 @@ Imports:
     reshape2,
     stats
 Suggests:
-    loo,
-    plotly
+    loo
 LinkingTo: Rcpp, RcppArmadillo, RcppDist
 RoxygenNote: 7.1.0
 RdMacros: Rdpack

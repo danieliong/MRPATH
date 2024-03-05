@@ -9,7 +9,8 @@
 }
 \usage{
     MRPATH_scatterplot(data, MCEM_fit = NULL,
-    exposure_name = "exposure", outcome_name = "outcome", overDispersedY = FALSE)
+    exposure_name = "exposure", outcome_name = "outcome",
+    overDispersedY = FALSE, interactive = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -18,6 +19,7 @@
     \item{exposure_name}{Name of risk exposure variable.}
     \item{outcome_name}{Name of disease outcome variable.}
     \item{overDispersedY}{If \code{TRUE}, replaces \code{se.exposure} with \code{tau * se.exposure}.}
+    \item{interactive}{Logical, if plot is interactive. Default \code{TRUE}.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~

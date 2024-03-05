@@ -16,24 +16,24 @@ getImportanceSamples(data, MCEM_fit, Nsamples = 50000)
   \item{data}{A data frame. (see Details in \code{\link{MR_PATH}}).}
   \item{MCEM_fit}{Output from \code{\link{MR_PATH}}.}
 }
-\details{
+% \details{
 %%  ~~ If necessary, more details than the description above ~~
-}
+% }
 \value{
   \item{thetaX}{\code{p} by \code{Nsamples} matrix of importance samples of true marginal SNP-exposure effects}
   \item{beta}{\code{p} by \code{Nsamples} matrix of importance samples of SNP-specific causal effects}
   \item{alpha}{\code{p} by \code{Nsamples} by \code{K} array of importance samples of cluster membership probabilities.}
   \item{W}{\code{p} by \code{Nsamples} matrix of importance weights}
  }
-\references{
+% \references{
 %% ~put references to the literature/web site here ~
-}
-\author{
+% }
+% \author{
 %%  ~~who you are~~
-}
-\note{
+% }
+% \note{
 %%  ~~further notes~~
-}
+% }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
@@ -68,5 +68,5 @@ impt_samples = getImportanceSamples(hdl_chd, MCEM_fit)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+% \keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
+% \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

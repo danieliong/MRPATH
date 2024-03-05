@@ -81,15 +81,17 @@ MRPATH_scatterplot <- function(data, MCEM_fit = NULL,
 
     if (interactive) {
       # Convert ggplot to plotly
-      p_interactive <- ggplotly(p, tooltip = c("text"))
+      p_interactive <- plotly::ggplotly(p, tooltip = c("text"))
 
       # Fix legend labels
-      p_interactive <- plotly_build(p_interactive)
+      p_interactive <- plotly::plotly_build(p_interactive)
       for (k in 1:K) {
         p_interactive$x$data[[k]]$name <- as.character(k)
       }
 
       # Add lines and intervals
+      p_build <- ggplot_build(p)
+      x_grid <- seq(0, p_build$layout$panel_params[[1]]$x.range[2], .001)
       for (k in 1:K) {
         y <- (fitted.mus[k]) * x_grid
         ymin <- (fitted.mus[k] - fitted.sds[k]) * x_grid
@@ -103,7 +105,7 @@ MRPATH_scatterplot <- function(data, MCEM_fit = NULL,
           sep = ""
         )
         p_interactive <- p_interactive %>%
-          add_lines(
+          plotly::add_lines(
             x = ~x, y = ~y,
             color = ~k, colors = "Set1",
             text = hovertxt_lines,
@@ -112,7 +114,7 @@ MRPATH_scatterplot <- function(data, MCEM_fit = NULL,
             showlegend = FALSE,
             inherit = TRUE
           ) %>%
-          add_ribbons(
+          plotly::add_ribbons(
             x = ~x, ymin = ~ymin, ymax = ~ymax,
             color = ~k,
             colors = "Set1",
@@ -204,8 +206,8 @@ MREMalt.scatterplot <- function(data, EM_fit = NULL,
 
 
   if (interactive) {
-    p <- ggplotly(p, tooltip = c("text"))
-    p <- add_lines(p,
+    p <- plotly::ggplotly(p, tooltip = c("text"))
+    p <- plotly::add_lines(p,
       x = ~x, y = ~y, color = ~k, colors = "Set1",
       data = lines_dat, inherit = TRUE, hoverinfo = "none"
     )

@@ -16,9 +16,9 @@
     \item{MCEM_fit}{Output from \code{\link{MR_PATH}}.}
     \item{ret.snps}{If \code{TRUE}, returns both plot and a list of ordered SNPs. Default is \code{FALSE}.}
 }
-\details{
+% \details{
 %%  ~~ If necessary, more details than the description above ~~
-}
+% }
 \value{
 Returns a 95\% credible interval plot (top) and cluster membership probabilities barplot (bottom).
 }

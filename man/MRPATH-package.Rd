@@ -27,9 +27,9 @@ Maintainer: Daniel Iong <daniong@umich.edu>
   \insertAllCited{}
 }
 \keyword{ package }
-\seealso{
-
-}
+% \seealso{
+% 
+% }
 % \examples{
 %   \dontrun{
 %      ## Optional simple examples of the most important functions

@@ -20,9 +20,9 @@
     \item{verbose}{If \code{TRUE}, prints BIC for each value in \code{K_range}.}
     \item{...}{Additional parameters to be passed to \code{\link{MRPATH_optimizeInitVals}}.}
 }
-\details{
+% \details{
 %%  ~~ If necessary, more details than the description above ~~
-}
+% }
 \value{
 Returns a list with
 \item{bestK}{\code{K} with highest \code{BIC}.}
@@ -72,5 +72,5 @@ modSelectionObj$BIC
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+% \keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
+% \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

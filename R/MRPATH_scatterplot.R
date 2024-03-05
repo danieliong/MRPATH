@@ -114,7 +114,7 @@ MRPATH_scatterplot <- function(data, MCEM_fit = NULL,
             showlegend = FALSE,
             inherit = TRUE
           ) %>%
-          add_ribbons(
+          plotly::add_ribbons(
             x = ~x, ymin = ~ymin, ymax = ~ymax,
             color = ~k,
             colors = "Set1",

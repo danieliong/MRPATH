@@ -81,7 +81,7 @@ MRPATH_scatterplot <- function(data, MCEM_fit = NULL,
 
     if (interactive) {
       # Convert ggplot to plotly
-      p_interactive <- ggplotly(p, tooltip = c("text"))
+      p_interactive <- plotly::ggplotly(p, tooltip = c("text"))
 
       # Fix legend labels
       p_interactive <- plotly_build(p_interactive)
@@ -204,7 +204,7 @@ MREMalt.scatterplot <- function(data, EM_fit = NULL,
 
 
   if (interactive) {
-    p <- ggplotly(p, tooltip = c("text"))
+    p <- plotly::ggplotly(p, tooltip = c("text"))
     p <- add_lines(p,
       x = ~x, y = ~y, color = ~k, colors = "Set1",
       data = lines_dat, inherit = TRUE, hoverinfo = "none"

@@ -105,7 +105,7 @@ MRPATH_scatterplot <- function(data, MCEM_fit = NULL,
           sep = ""
         )
         p_interactive <- p_interactive %>%
-          add_lines(
+          plotly::add_lines(
             x = ~x, y = ~y,
             color = ~k, colors = "Set1",
             text = hovertxt_lines,
@@ -207,7 +207,7 @@ MREMalt.scatterplot <- function(data, EM_fit = NULL,
 
   if (interactive) {
     p <- plotly::ggplotly(p, tooltip = c("text"))
-    p <- add_lines(p,
+    p <- plotly::add_lines(p,
       x = ~x, y = ~y, color = ~k, colors = "Set1",
       data = lines_dat, inherit = TRUE, hoverinfo = "none"
     )

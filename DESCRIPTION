@@ -18,7 +18,8 @@ Imports:
     RColorBrewer,
     Rdpack (>= 0.7),
     reshape2,
-    stats
+    stats,
+    magrittr
 Suggests:
     loo
 LinkingTo: Rcpp, RcppArmadillo, RcppDist
